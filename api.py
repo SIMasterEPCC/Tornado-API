@@ -6,6 +6,7 @@ import tornado.options
 import tornado.web
 import json
 import ast
+from datetime import datetime
 
 from tornado.options import define, options
 
@@ -33,7 +34,7 @@ class TemperatureHandler(tornado.web.RequestHandler):
         medidasdb = db.medidas
         cursor = medidasdb.find({},{"_id":0})
         medidas = list(cursor)
-        self.write("{\"temperature\":[")
+        self.write("{\"medidas\":[")
         for document in medidas[:len(medidas)-1]:
             self.write(document)
             self.write(",")
@@ -41,13 +42,16 @@ class TemperatureHandler(tornado.web.RequestHandler):
         self.write("]}")
         	
     def post(self):
-        db = self.application.database
-        data = json.loads(self.request.body.decode('utf-8'))
-	d = ast.literal_eval(str(data))
-        db.temperature.insert(d)
-	print type(d)
-        print('JSON data:', d)
-        self.write("200")
+#        db = self.application.database
+#        data = json.loads(self.request.body.decode('utf-8'))
+#	 d = ast.literal_eval(str(data))
+#        db.temperature.insert(d)
+        data = self.request.body.decode('utf-8')
+        values = data.split("&")
+        temperature = values[0].split("=")[1]
+        humidity = values[1].split("=")[1]
+        json = "{\"Temperatura\":" + str(temperature) + ", \"Fecha\":\"" + str(datetime.now().strftime('%Y/%m/%d %H:%M:%S')) + "\", \"Dispositivo\":1, \"Humedad\":\"" + str(humidity) + "\"}"
+        print(json)
 
 def main():
     tornado.options.parse_command_line()
