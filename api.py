@@ -40,17 +40,17 @@ class TemperatureHandler(tornado.web.RequestHandler):
             self.write(",")
         self.write(medidas[-1])
         self.write("]}")
-        	
+            
     def post(self):
-#        db = self.application.database
-#        data = json.loads(self.request.body.decode('utf-8'))
-#	 d = ast.literal_eval(str(data))
-#        db.temperature.insert(d)
+        db = self.application.database
         data = self.request.body.decode('utf-8')
         values = data.split("&")
         temperature = values[0].split("=")[1]
         humidity = values[1].split("=")[1]
-        json = "{\"Temperatura\":" + str(temperature) + ", \"Fecha\":\"" + str(datetime.now().strftime('%Y/%m/%d %H:%M:%S')) + "\", \"Dispositivo\":1, \"Humedad\":\"" + str(humidity) + "\"}"
+        data = "{\"Temperatura\":" + str(temperature) + ", \"Fecha\":\"" + str(datetime.now().strftime('%Y/%m/%d %H:%M:%S')) + "\", \"Dispositivo\":1, \"Humedad\":\"" + str(humidity) + "\"}"
+        jsonValue = json.loads(data)
+        d = ast.literal_eval(str(jsonValue))
+        db.medidas.insert(d)
         print(json)
 
 def main():
